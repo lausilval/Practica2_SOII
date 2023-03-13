@@ -20,7 +20,7 @@ int producir_elemento() {
 //función para insertar un elemento en el buffer
 void insertar_elemento(int elemento) {
 	tope++;
-	pila[tope] = elemento;
+	buffer[tope] = elemento;
 }
 
 //función del productor
