@@ -11,13 +11,17 @@
 #include <semaphore.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/types.h>
+#include <signal.h>
 
 // CONSTANTES
 #define N 10
 
 // VARIABLES GLOBALES
 // variable para las posiciones del buffer.
-int *cuenta = 0;
+int *cuenta;
 // El buffer debe ser del tipo int y funcionar como una pila LIFO
 //(Last In First Out), es decir el ultimo en entrar va a ser el primero en salir
 int *buffer;	
@@ -30,7 +34,7 @@ void quitar_elemento(int *indice)
 
 void consume_item(int elemento)
 {
-	printf("Consumidor: \n\tSe ha consumido el elemento: %d\n\tContador: %d", elemento, cuenta);
+	printf("Consumidor: \n\tSe ha consumido el elemento: %d\n\tContador: %d", elemento, *cuenta);
 }
 
 int produce_item() {
@@ -65,7 +69,7 @@ int main()
       * @param offset un desplazamiento desde el inicio del archivo de 0
       * @return
 	*/
-	cuenta = mmap(NULL, sizeof *cuenta, PROT_READ | PROT_WRITE, MAP_SHARED, -1, 0);
+	cuenta = mmap(NULL, sizeof(*cuenta), PROT_READ | PROT_WRITE, MAP_SHARED, -1, 0);
 	if(cuenta == MAP_FAILED) 	// comprobamos que se haya creado bien
 	{
 		perror("ERROR en el mmap() de cuenta");
@@ -74,7 +78,7 @@ int main()
 	// inicializamos el contador, en un primer momento el buffer estara vacio
 	*cuenta = 0;
 	
-	buffer = mmap(NULL, N * sizeof *buffer, PROT_READ | PROT_WRITE, MAP_SHARED, -1, 0);
+	buffer = mmap(NULL, N * sizeof(*buffer), PROT_READ | PROT_WRITE, MAP_SHARED, -1, 0);
 	if(buffer == MAP_FAILED)
 	{
 		perror("ERROR en el mmap() de buffer");
@@ -107,7 +111,7 @@ int main()
 				kill(getppid(), SIGUSR1);
 			}
 			
-			consumir_elemento(elemento);	// imprimimos el elemento
+			consume_item(elemento);	// imprimimos el elemento
 			i++;
 		}
 		
@@ -140,15 +144,15 @@ int main()
 			(*cuenta)++;
 			printf("Productor: \n\telemento %d insertado en el buffer\n", elemento);
 			
-			if(*cuenta == 5)	// si el buffer esta lleno se despierta al consumidor
+			if(*cuenta == N)	// si el buffer esta lleno se despierta al consumidor
 			{
 				printf("Productor: buffer lleno, despertando al consumidor\n");
 				kill(getppid(), SIGUSR1);
 			}
 			
-			consumir_elemento(elemento);	// imprimimos el elemento
-			i++;
+			j++;
 		}
+	}
 	else if(productor == -1)
 	{
 		// ERROR
@@ -160,21 +164,15 @@ int main()
 	
 	}
 		
-// cerramos la region de memoria compartida
-if (munmap(cuenta, sizeof(*cuenta)))
-{
-	perror("ERROR al cerrar la region de memoria compartida del contador");
-}
-if(munmap(buffer, N*sizeof(buffer))
-{
-	perror("ERROR al cerrar la region de memoria compartida del buffer");
-}
+	// cerramos la region de memoria compartida
+	if (munmap(cuenta, sizeof(*cuenta)))
+	{
+		perror("ERROR al cerrar la region de memoria compartida del contador");
+	}
+	if(munmap(buffer, N*sizeof(buffer)))
+	{
+		perror("ERROR al cerrar la region de memoria compartida del buffer");
+	}
 	
-	
-	
-	
-	
-
-
-
+	return(EXIT_SUCCESS);
 }
