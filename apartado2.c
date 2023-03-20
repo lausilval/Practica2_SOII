@@ -68,13 +68,13 @@ int main(int argc, *char argv[])
 	// 3. Creamos las zonas compartidas para los procesos
 	/** Parametros de mmap:
 	* mmap() crea la proyeccion de un archivo, asignar una región de memoria en el espacio de direcciones de un proceso
-	*@param addr NULL para que el sistema operativa elija la direccion de memoria
+	* @param addr NULL para que el sistema operativa elija la direccion de memoria
     	* @param len tamaño en bytes de la región de memoria que se desea asignar.
-      * @param prot permisos de protección para la región de memoria en este caso se le otorgaran de lectura y escritura
-      * @param flags area de memoria compartida
-      * @param fd descriptor de archivo para el archivo que se va a asignar a la memoria. Si se está haciendo una asignación anónima, este parámetro debe ser -1
-      * @param offset un desplazamiento desde el inicio del archivo de 0
-      * @return
+        * @param prot permisos de protección para la región de memoria en este caso se le otorgaran de lectura y escritura
+      	* @param flags area de memoria compartida
+      	* @param fd descriptor de archivo para el archivo que se va a asignar a la memoria. Si se está haciendo una asignación anónima, este parámetro debe ser -1
+     	 * @param offset un desplazamiento desde el inicio del archivo de 0
+      	* @return
 	*/
 	buffer = mmap(NULL, N * sizeof *buffer, PROT_READ | PROT_WRITE, MAP_SHARED, -1, 0);
 	if(buffer == MAP_FAILED)	// comprobacion de que se crea correctamente
@@ -124,10 +124,10 @@ int main(int argc, *char argv[])
 	// 5. Creamos los procesos asociados al productor y consumidor
 	// - Crearemos un proceso hijo para cada uno
 	// - Crearemos antes el proceso asociado al consumidor ya que así nos 
-	//   aseguramos que el productor no inserte un numero elevado de elementos
-	//   antes de que el consumidor pueda eliminarlos. Asi, al empezar el consumidor
-	//   primero, este estará inactivo hasta que el productor instroduzca los
-	//   primero elementos en el buffer
+	//   	aseguramos que el productor no inserte un numero elevado de elementos
+	//   	antes de que el consumidor pueda eliminarlos. Asi, al empezar el consumidor
+	//   	primero, este estará inactivo hasta que el productor instroduzca los
+	//   	primero elementos en el buffer
 	
 	if((consumidor = fork()) == 0 )
 	{
